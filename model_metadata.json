@@ -1,0 +1,150 @@
+{
+  "model_name": "XGBClassifier",
+  "n_estimators": 300,
+  "test_accuracy": 0.9094,
+  "cv_accuracy": 0.9076,
+  "feature_cols": [
+    "Age",
+    "sneezing",
+    "runny nose",
+    "rash",
+    "shortness of breath",
+    "wheezing",
+    "chest tightness",
+    "cough",
+    "mucus production",
+    "fever",
+    "sore throat",
+    "nausea",
+    "vomiting",
+    "diarrhea",
+    "abdominal pain",
+    "appetite loss",
+    "headache",
+    "muscle pain",
+    "fatigue",
+    "sweating",
+    "chills",
+    "facial pressure",
+    "nasal congestion",
+    "sensitivity to light",
+    "sensitivity to sound",
+    "throbbing pain",
+    "bloating",
+    "heartburn",
+    "burping",
+    "back pain",
+    "dizziness",
+    "joint pain",
+    "eye irritation"
+  ],
+  "symptom_cols": [
+    "sneezing",
+    "runny nose",
+    "rash",
+    "shortness of breath",
+    "wheezing",
+    "chest tightness",
+    "cough",
+    "mucus production",
+    "fever",
+    "sore throat",
+    "nausea",
+    "vomiting",
+    "diarrhea",
+    "abdominal pain",
+    "appetite loss",
+    "headache",
+    "muscle pain",
+    "fatigue",
+    "sweating",
+    "chills",
+    "facial pressure",
+    "nasal congestion",
+    "sensitivity to light",
+    "sensitivity to sound",
+    "throbbing pain",
+    "bloating",
+    "heartburn",
+    "burping",
+    "back pain",
+    "dizziness",
+    "joint pain",
+    "eye irritation"
+  ],
+  "classes": [
+    "Allergy",
+    "Asthma",
+    "Bronchitis",
+    "Common Cold",
+    "Food Poisoning",
+    "Gastritis",
+    "Influenza",
+    "Migraine",
+    "Sinusitis",
+    "Ulcer"
+  ],
+  "urgency_map": {
+    "Allergy": {
+      "level": 1,
+      "label": "Low",
+      "color": "#22c55e",
+      "advice": "Usually manageable with OTC antihistamines. See a doctor if symptoms persist beyond 1 week or are severe."
+    },
+    "Asthma": {
+      "level": 3,
+      "label": "High",
+      "color": "#ef4444",
+      "advice": "Use rescue inhaler if available. Seek medical attention promptly. Go to ER if breathing is severely restricted."
+    },
+    "Bronchitis": {
+      "level": 2,
+      "label": "Medium",
+      "color": "#f59e0b",
+      "advice": "Rest and stay hydrated. See a doctor within 2-3 days, especially with high fever or blood in cough."
+    },
+    "Common Cold": {
+      "level": 1,
+      "label": "Low",
+      "color": "#22c55e",
+      "advice": "Rest, fluids, and OTC cold remedies. Should resolve in 7-10 days. See a doctor if symptoms worsen."
+    },
+    "Food Poisoning": {
+      "level": 2,
+      "label": "Medium",
+      "color": "#f59e0b",
+      "advice": "Stay hydrated. Seek immediate care if severely dehydrated, blood in stool, or symptoms persist beyond 48 hours."
+    },
+    "Gastritis": {
+      "level": 2,
+      "label": "Medium",
+      "color": "#f59e0b",
+      "advice": "Avoid spicy/acidic foods and NSAIDs. See a doctor if severe or persistent. Antacids may help short-term."
+    },
+    "Influenza": {
+      "level": 2,
+      "label": "Medium",
+      "color": "#f59e0b",
+      "advice": "Rest and fluids. See a doctor if in a high-risk group or symptoms worsen after initial improvement."
+    },
+    "Migraine": {
+      "level": 2,
+      "label": "Medium",
+      "color": "#f59e0b",
+      "advice": "Rest in a dark, quiet room. OTC pain relievers may help. See a doctor for recurring or severe migraines."
+    },
+    "Sinusitis": {
+      "level": 1,
+      "label": "Low",
+      "color": "#22c55e",
+      "advice": "Nasal irrigation and decongestants can help. See a doctor if symptoms last beyond 10 days or worsen."
+    },
+    "Ulcer": {
+      "level": 3,
+      "label": "High",
+      "color": "#ef4444",
+      "advice": "See a doctor soon. Avoid NSAIDs and acidic foods. Go to ER immediately if you see black/tarry stools or vomit blood."
+    }
+  },
+  "data_note": "Original Kaggle CSV had randomly assigned symptoms (no medical signal). Model trained on medically-grounded synthetic dataset with clinical symptom prevalence probabilities per disease."
+}

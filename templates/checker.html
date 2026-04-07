@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Symptom Checker</title>
+
+<style>
+body {
+    font-family: 'Segoe UI';
+    background: radial-gradient(circle at top, #0f2027, #203a43, #2c5364);
+    color: white;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1000px;
+    margin: auto;
+}
+
+.back {
+    color: #2dd4bf;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: 36px;
+}
+
+input {
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    margin: 10px 0;
+    width: 200px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.card {
+    padding: 15px;
+    border-radius: 15px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    cursor: pointer;
+    text-align: left;
+    transition: 0.3s;
+}
+
+.card:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+.selected {
+    background: linear-gradient(135deg, #2dd4bf, #22c55e);
+    color: black;
+}
+
+/* COUNT TEXT */
+#countText {
+    margin-top: 20px;
+    opacity: 0.7;
+}
+
+/* BUTTON */
+.predict-btn {
+    width: 100%;
+    margin-top: 20px;
+    padding: 18px;
+    border-radius: 40px;
+    border: none;
+    background: linear-gradient(135deg, #2dd4bf, #22c55e);
+    color: black;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.predict-btn:hover {
+    transform: scale(1.02);
+    opacity: 0.9;
+}
+
+/* RESULT CARD */
+#result {
+    margin-top: 30px;
+}
+
+.result-card {
+    padding: 20px;
+    border-radius: 15px;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    text-align: left;
+}
+
+.result-item {
+    margin: 15px 0;
+}
+
+.result-item span {
+    display: block;
+    font-size: 14px;
+    opacity: 0.7;
+}
+
+.result-item b {
+    font-size: 18px;
+}
+
+.result-item p {
+    margin-top: 5px;
+    line-height: 1.4;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="back" onclick="location.href='/'">← Back to Home</div>
+
+<h1>Symptom Checker</h1>
+<p>Select your age and tap all symptoms that apply.</p>
+
+<input type="number" id="age" placeholder="e.g. 28"> years
+
+<h3>Select Your Symptoms</h3>
+
+<div class="grid" id="symptomGrid"></div>
+
+<p id="countText">0 symptoms selected</p>
+
+<button class="predict-btn" onclick="predict()">
+    Analyze Symptoms →
+</button>
+
+<div id="result"></div>
+
+</div>
+
+<script>
+
+const symptomsList = [
+    "headache","fever","cough","fatigue","nausea","sore throat",
+    "body aches","runny nose","shortness of breath","dizziness",
+    "chest pain","stomach pain","chills","loss of appetite","insomnia"
+];
+
+let selected = [];
+
+const grid = document.getElementById("symptomGrid");
+
+symptomsList.forEach(symptom => {
+    let div = document.createElement("div");
+    div.className = "card";
+    div.innerText = symptom;
+
+    div.onclick = () => {
+        div.classList.toggle("selected");
+
+        if(selected.includes(symptom)){
+            selected = selected.filter(s => s !== symptom);
+        } else {
+            selected.push(symptom);
+        }
+
+        document.getElementById("countText").innerText =
+            selected.length + " symptom" + (selected.length !== 1 ? "s" : "") + " selected";
+    };
+
+    grid.appendChild(div);
+});
+
+function predict() {
+    let age = document.getElementById("age").value;
+
+    fetch("/predict", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            age: parseInt(age),
+            symptoms: selected
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        let urgencyColor =
+            data.urgency === "High" ? "#ff4d4d" :
+            data.urgency === "Medium" ? "#f59e0b" :
+            "#22c55e";
+
+        document.getElementById("result").innerHTML = `
+        <div class="result-card">
+            <h3>Prediction Result</h3>
+
+            <div class="result-item">
+                <span>Disease</span>
+                <b>${data.disease}</b>
+            </div>
+
+            <div class="result-item">
+                <span>Urgency</span>
+                <b style="color:${urgencyColor}">
+                    ${data.urgency}
+                </b>
+            </div>
+
+            <div class="result-item">
+                <span>Advice</span>
+                <p>${data.advice}</p>
+            </div>
+        </div>
+        `;
+    });
+}
+
+</script>
+
+</body>
+</html>
