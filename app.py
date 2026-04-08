@@ -5,7 +5,7 @@ import numpy as np
 
 app = Flask(__name__)
 
-# Load model and files
+# Load model
 model = joblib.load("disease_model.pkl")
 le = joblib.load("label_encoder.pkl")
 
@@ -15,47 +15,62 @@ with open("model_metadata.json") as f:
 FEATURES = metadata["feature_cols"]
 URGENCY = metadata["urgency_map"]
 
-# Home route (for browser test)
+# ✅ Advice mapping (REQUIRED for UI)
+ADVICE = {
+    "Allergy": "Take antihistamines and avoid allergens.",
+    "Asthma": "Use inhaler and seek medical help if severe.",
+    "Bronchitis": "Rest, hydrate, and avoid cold air.",
+    "Common Cold": "Rest and drink fluids.",
+    "Food Poisoning": "Stay hydrated and eat light food.",
+    "Gastritis": "Avoid spicy food and eat light meals.",
+    "Influenza": "Rest, fluids, and medication if needed.",
+    "Migraine": "Rest in dark room and avoid triggers.",
+    "Sinusitis": "Steam inhalation and hydration.",
+    "Ulcer": "Consult doctor and avoid acidic food."
+}
+
 @app.route("/")
 def home():
     return render_template("index.html")
 
 @app.route("/checker")
 def checker():
-    print("Rendering checker page")
     return render_template("checker.html")
 
-# Prediction route
 @app.route("/predict", methods=["POST"])
 def predict():
-    data = request.get_json()
+    try:
+        data = request.get_json()
 
-    age = data["age"]
-    symptoms = data["symptoms"]
+        age = data.get("age", 0)
+        symptoms = data.get("symptoms", [])
+        symptoms = [s.lower().strip() for s in symptoms]
 
-    # Create input vector
-    input_data = [0] * len(FEATURES)
+        input_data = [0] * len(FEATURES)
+        feature_map = [f.lower().strip() for f in FEATURES]
 
-    for i, feature in enumerate(FEATURES):
-        if feature == "Age":
-            input_data[i] = age
-        elif feature in symptoms:
-            input_data[i] = 1
+        for i, f in enumerate(feature_map):
+            if f == "age":
+                input_data[i] = age
+            elif f in symptoms:
+                input_data[i] = 1
 
-    input_array = np.array([input_data])
+        probs = model.predict_proba([input_data])[0]
+        top = np.argsort(probs)[-3:][::-1]
 
-    # Predict disease
-    pred = model.predict(input_array)[0]
-    disease = le.inverse_transform([pred])[0]
+        best_idx = top[0]
+        disease = le.inverse_transform([best_idx])[0].strip()
 
-    # Get urgency
-    urgency = URGENCY[disease]
+        return jsonify({
+            "disease": disease,
+            "confidence": round(float(probs[best_idx]) * 100, 2),
+            "urgency": URGENCY.get(disease, "Unknown"),
+            "advice": ADVICE.get(disease, "Consult a doctor.")
+        })
 
-    return jsonify({
-        "disease": disease,
-        "urgency": urgency["label"],
-        "advice": urgency["advice"]
-    })
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+    print("🚀 Server running...")
+    app.run(debug=True)

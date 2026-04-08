@@ -1,40 +1,61 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Symptom Checker</title>
 
 <style>
-body {
+
+/* 🔥 GLOBAL FIX */
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* removes weird line */
     font-family: 'Segoe UI';
     background: radial-gradient(circle at top, #0f2027, #203a43, #2c5364);
     color: white;
-    margin: 0;
-    padding: 20px;
 }
 
+/* 🔥 CONTAINER */
 .container {
     max-width: 1000px;
     margin: auto;
+    padding: 20px;
+    width: 100%;
 }
 
+/* 🔙 BACK BUTTON */
 .back {
     color: #2dd4bf;
     cursor: pointer;
     margin-bottom: 20px;
 }
 
+/* 🔥 HEADER */
 h1 {
     font-size: 36px;
 }
 
+p {
+    opacity: 0.8;
+}
+
+/* 🔥 INPUT */
 input {
     padding: 12px;
     border-radius: 12px;
     border: none;
     margin: 10px 0;
-    width: 200px;
+    width: 100%;
+    max-width: 250px;
 }
 
+/* 🔥 GRID */
 .grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -42,13 +63,13 @@ input {
     margin-top: 20px;
 }
 
+/* 🔥 CARD */
 .card {
     padding: 15px;
     border-radius: 15px;
     background: rgba(255,255,255,0.08);
     border: 1px solid rgba(255,255,255,0.1);
     cursor: pointer;
-    text-align: left;
     transition: 0.3s;
 }
 
@@ -61,13 +82,13 @@ input {
     color: black;
 }
 
-/* COUNT TEXT */
+/* 🔥 TEXT */
 #countText {
     margin-top: 20px;
     opacity: 0.7;
 }
 
-/* BUTTON */
+/* 🔥 BUTTON */
 .predict-btn {
     width: 100%;
     margin-top: 20px;
@@ -77,17 +98,15 @@ input {
     background: linear-gradient(135deg, #2dd4bf, #22c55e);
     color: black;
     font-size: 18px;
-    font-weight: 500;
     cursor: pointer;
     transition: 0.3s;
 }
 
 .predict-btn:hover {
     transform: scale(1.02);
-    opacity: 0.9;
 }
 
-/* RESULT CARD */
+/* 🔥 RESULT */
 #result {
     margin-top: 30px;
 }
@@ -96,30 +115,48 @@ input {
     padding: 20px;
     border-radius: 15px;
     background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(10px);
-    text-align: left;
 }
 
-.result-item {
-    margin: 15px 0;
+/* 📱 RESPONSIVE */
+
+/* Tablet */
+@media (max-width: 768px) {
+
+    h1 {
+        font-size: 28px;
+    }
+
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
-.result-item span {
-    display: block;
-    font-size: 14px;
-    opacity: 0.7;
+/* Mobile */
+@media (max-width: 480px) {
+
+    h1 {
+        font-size: 22px;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .container {
+        padding: 10px;
+    }
+
+    input {
+        width: 100%;
+    }
+
+    .predict-btn {
+        padding: 15px;
+        font-size: 16px;
+    }
 }
 
-.result-item b {
-    font-size: 18px;
-}
-
-.result-item p {
-    margin-top: 5px;
-    line-height: 1.4;
-}
 </style>
-
 </head>
 
 <body>
@@ -129,19 +166,17 @@ input {
 <div class="back" onclick="location.href='/'">← Back to Home</div>
 
 <h1>Symptom Checker</h1>
-<p>Select your age and tap all symptoms that apply.</p>
+<p>Select your age and symptoms</p>
 
-<input type="number" id="age" placeholder="e.g. 28"> years
+<input type="number" id="age" placeholder="Enter age">
 
-<h3>Select Your Symptoms</h3>
+<h3>Symptoms</h3>
 
 <div class="grid" id="symptomGrid"></div>
 
 <p id="countText">0 symptoms selected</p>
 
-<button class="predict-btn" onclick="predict()">
-    Analyze Symptoms →
-</button>
+<button class="predict-btn" onclick="predict()">Analyze</button>
 
 <div id="result"></div>
 
@@ -151,8 +186,8 @@ input {
 
 const symptomsList = [
     "headache","fever","cough","fatigue","nausea","sore throat",
-    "body aches","runny nose","shortness of breath","dizziness",
-    "chest pain","stomach pain","chills","loss of appetite","insomnia"
+    "muscle pain","runny nose","shortness of breath","dizziness",
+    "chest tightness","abdominal pain","chills","appetite loss","insomnia"
 ];
 
 let selected = [];
@@ -174,7 +209,7 @@ symptomsList.forEach(symptom => {
         }
 
         document.getElementById("countText").innerText =
-            selected.length + " symptom" + (selected.length !== 1 ? "s" : "") + " selected";
+            selected.length + " symptom(s) selected";
     };
 
     grid.appendChild(div);
@@ -203,22 +238,10 @@ function predict() {
         <div class="result-card">
             <h3>Prediction Result</h3>
 
-            <div class="result-item">
-                <span>Disease</span>
-                <b>${data.disease}</b>
-            </div>
-
-            <div class="result-item">
-                <span>Urgency</span>
-                <b style="color:${urgencyColor}">
-                    ${data.urgency}
-                </b>
-            </div>
-
-            <div class="result-item">
-                <span>Advice</span>
-                <p>${data.advice}</p>
-            </div>
+            <p><b>Disease:</b> ${data.disease}</p>
+            <p><b>Confidence:</b> ${data.confidence}%</p>
+            <p><b>Urgency:</b> <span style="color:${urgencyColor}">${data.urgency}</span></p>
+            <p><b>Advice:</b> ${data.advice}</p>
         </div>
         `;
     });

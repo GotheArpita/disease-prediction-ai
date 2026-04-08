@@ -1,24 +1,30 @@
-import joblib, json, numpy as np
-model = joblib.load('disease_model.pkl')
-le = joblib.load('label_encoder.pkl')
-with open('model_metadata.json') as f:
+import joblib
+import json
+import numpy as np
+
+model = joblib.load("disease_model.pkl")
+le = joblib.load("label_encoder.pkl")
+
+with open("model_metadata.json") as f:
     metadata = json.load(f)
-FEATURES = metadata['feature_cols']
+
+FEATURES = metadata["feature_cols"]
 
 def pred(age, symptoms):
-    input_data = [0] * len(FEATURES)
-    for i, feature in enumerate(FEATURES):
-        if feature == 'Age': input_data[i] = age
-        elif feature in symptoms: input_data[i] = 1
-    pred = model.predict(np.array([input_data]))[0]
-    preds_proba = model.predict_proba(np.array([input_data]))[0]
-    res_proba = {le.inverse_transform([i])[0]: round(p*100, 2) for i, p in enumerate(preds_proba)}
-    print(f'Age: {age}, Symptoms: {symptoms}')
-    print(f'  => {le.inverse_transform([pred])[0]}')
-    print(f'  => {dict(sorted(res_proba.items(), key=lambda item: item[1], reverse=True)[:3])}')
+    input_data = [0]*len(FEATURES)
 
-pred(25, ['fever'])
-pred(25, ['fever', 'muscle pain', 'fatigue'])
-pred(25, ['fever', 'muscle pain', 'fatigue', 'cough'])
-pred(45, ['fever', 'fatigue'])
-pred(45, ['fever', 'body pain', 'fatigue'])
+    for i,f in enumerate(FEATURES):
+        if f == "Age":
+            input_data[i] = age
+        elif f in symptoms:
+            input_data[i] = 1
+
+    probs = model.predict_proba([input_data])[0]
+
+    top = np.argsort(probs)[-3:][::-1]
+
+    print("\n--- RESULT ---")
+    for i in top:
+        print(le.inverse_transform([i])[0], round(probs[i]*100,2),"%")
+
+pred(25, ["fever","cough"])
