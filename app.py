@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, render_template
 import joblib
 import json
 import numpy as np
+import os  # ✅ FIXED (moved here)
 
 app = Flask(__name__)
 
@@ -15,7 +16,7 @@ with open("model_metadata.json") as f:
 FEATURES = metadata["feature_cols"]
 URGENCY = metadata["urgency_map"]
 
-# ✅ Advice mapping (REQUIRED for UI)
+# ✅ Advice mapping
 ADVICE = {
     "Allergy": "Take antihistamines and avoid allergens.",
     "Asthma": "Use inhaler and seek medical help if severe.",
@@ -71,6 +72,6 @@ def predict():
     except Exception as e:
         return jsonify({"error": str(e)})
 
+# ✅ FINAL RUN CONFIG (RENDER FIX)
 if __name__ == "__main__":
-    print("🚀 Server running...")
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
