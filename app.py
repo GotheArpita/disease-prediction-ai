@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, render_template
 import joblib
 import json
 import numpy as np
-import os  # ✅ FIXED (moved here)
+import os
 
 app = Flask(__name__)
 
@@ -16,18 +16,58 @@ with open("model_metadata.json") as f:
 FEATURES = metadata["feature_cols"]
 URGENCY = metadata["urgency_map"]
 
-# ✅ Advice mapping
+# 🔥 FULL ADVICE SYSTEM (disease + urgency based)
 ADVICE = {
-    "Allergy": "Take antihistamines and avoid allergens.",
-    "Asthma": "Use inhaler and seek medical help if severe.",
-    "Bronchitis": "Rest, hydrate, and avoid cold air.",
-    "Common Cold": "Rest and drink fluids.",
-    "Food Poisoning": "Stay hydrated and eat light food.",
-    "Gastritis": "Avoid spicy food and eat light meals.",
-    "Influenza": "Rest, fluids, and medication if needed.",
-    "Migraine": "Rest in dark room and avoid triggers.",
-    "Sinusitis": "Steam inhalation and hydration.",
-    "Ulcer": "Consult doctor and avoid acidic food."
+    "Asthma": {
+        "High": "Severe breathing difficulty detected. Seek emergency medical care immediately.",
+        "Medium": "Avoid triggers, rest, and consult a doctor if symptoms persist.",
+        "Low": "Monitor breathing and avoid allergens or triggers."
+    },
+    "Allergy": {
+        "High": "Severe allergic reaction possible. Seek urgent medical attention.",
+        "Medium": "Avoid allergens and take precautions. Consult doctor if needed.",
+        "Low": "Mild symptoms. Maintain hygiene and avoid triggers."
+    },
+    "Bronchitis": {
+        "High": "Persistent breathing issues. Seek medical evaluation urgently.",
+        "Medium": "Rest, hydrate, and monitor cough.",
+        "Low": "Mild irritation. Stay warm and hydrated."
+    },
+    "Common Cold": {
+        "High": "Unusual severity. Seek medical attention.",
+        "Medium": "Rest, fluids, and monitor symptoms.",
+        "Low": "Mild cold. Home care is sufficient."
+    },
+    "Food Poisoning": {
+        "High": "Severe dehydration risk. Seek medical help immediately.",
+        "Medium": "Stay hydrated and eat light food.",
+        "Low": "Mild symptoms. Rest and hydration recommended."
+    },
+    "Gastritis": {
+        "High": "Severe abdominal pain. Seek medical attention.",
+        "Medium": "Avoid spicy food and eat light meals.",
+        "Low": "Manage diet and avoid irritants."
+    },
+    "Influenza": {
+        "High": "High fever and fatigue. Seek medical care.",
+        "Medium": "Rest and increase fluid intake.",
+        "Low": "Mild flu. Home care and rest."
+    },
+    "Migraine": {
+        "High": "Severe headache. Consult doctor immediately.",
+        "Medium": "Rest in a dark and quiet place.",
+        "Low": "Mild headache. Avoid triggers."
+    },
+    "Sinusitis": {
+        "High": "Severe sinus pressure. Seek medical attention.",
+        "Medium": "Steam inhalation and hydration.",
+        "Low": "Mild discomfort. Home remedies help."
+    },
+    "Ulcer": {
+        "High": "Severe stomach pain. Immediate medical care needed.",
+        "Medium": "Avoid acidic food and consult doctor.",
+        "Low": "Manage diet and monitor symptoms."
+    }
 }
 
 @app.route("/")
@@ -57,21 +97,30 @@ def predict():
                 input_data[i] = 1
 
         probs = model.predict_proba([input_data])[0]
-        top = np.argsort(probs)[-3:][::-1]
+        top_indices = np.argsort(probs)[-3:][::-1]
 
-        best_idx = top[0]
-        disease = le.inverse_transform([best_idx])[0].strip()
+        labels = ["Most Likely", "Possible", "Less Likely"]
+        results = []
 
-        return jsonify({
-            "disease": disease,
-            "confidence": round(float(probs[best_idx]) * 100, 2),
-            "urgency": URGENCY.get(disease, "Unknown"),
-            "advice": ADVICE.get(disease, "Consult a doctor.")
-        })
+        for i, idx in enumerate(top_indices):
+            disease = le.inverse_transform([idx])[0].strip()
+            urgency = URGENCY.get(disease, "Medium")
+
+            # 🔥 dynamic advice selection
+            advice = ADVICE.get(disease, {}).get(urgency, "Consult a doctor.")
+
+            results.append({
+                "rank": labels[i],
+                "disease": disease,
+                "confidence": round(float(probs[idx]) * 100, 2),
+                "urgency": urgency,
+                "advice": advice
+            })
+
+        return jsonify({"predictions": results})
 
     except Exception as e:
         return jsonify({"error": str(e)})
 
-# ✅ FINAL RUN CONFIG (RENDER FIX)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
