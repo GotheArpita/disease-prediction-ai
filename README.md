@@ -6,7 +6,7 @@ Built using Python, XGBoost, Scikit-Learn, Pandas, Plotly, and Streamlit, the ap
 🚀**Key Highlights**
 Machine Learning-powered Disease Prediction
 XGBoost Classification Model
-Achieved XX.XX% Prediction Accuracy
+Achieved 93% Prediction Accuracy
 Real-time Symptom Analysis
 Interactive Visualizations using Plotly
 Streamlit-based Web Application
