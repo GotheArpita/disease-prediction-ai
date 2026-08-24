@@ -1,6 +1,9 @@
 # Disease-Prediction-AI
 An AI-powered healthcare assistant that predicts possible diseases based on user symptoms using Machine Learning algorithms. The system analyzes symptom patterns, processes the input data, and provides intelligent disease predictions to assist users in understanding potential health conditions.
 Built using Python, XGBoost, Scikit-Learn, Pandas, Plotly, and Streamlit, the application combines data preprocessing, feature engineering, and machine learning techniques to deliver accurate symptom-based disease predictions through an intuitive user interface.
+
+🔗 **Live Demo:** https://disease-prediction-ai-zr4w.onrender.com
+
 ⚠️ Disclaimer: This application is developed for educational and research purposes only. It is not a substitute for professional medical diagnosis, treatment, or healthcare advice.
 
 🚀**Key Highlights**
