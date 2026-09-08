@@ -1,6 +1,6 @@
 # Disease-Prediction-AI
 An AI-powered healthcare assistant that predicts possible diseases based on user symptoms using Machine Learning algorithms. The system analyzes symptom patterns, processes the input data, and provides intelligent disease predictions to assist users in understanding potential health conditions.
-Built using Python, XGBoost, Scikit-Learn, Pandas, Plotly, and Streamlit, the application combines data preprocessing, feature engineering, and machine learning techniques to deliver accurate symptom-based disease predictions through an intuitive user interface.
+Built using Python, XGBoost, Scikit-Learn, Pandas, Plotly, and Flask, the application combines data preprocessing, feature engineering, and machine learning techniques to deliver accurate symptom-based disease predictions through an intuitive user interface.
 
 🔗 **Live Demo:** https://disease-prediction-ai-zr4w.onrender.com
 
@@ -12,7 +12,6 @@ XGBoost Classification Model
 Achieved 93% Prediction Accuracy
 Real-time Symptom Analysis
 Interactive Visualizations using Plotly
-Streamlit-based Web Application
 Feature Engineering and Data Preprocessing Pipeline
 Healthcare-focused AI Solution
 
@@ -53,7 +52,7 @@ NumPy
 Plotly
 Matplotlib
 **Application Framework**:
-Streamlit
+Flask
 File Handling
 OpenPyXL
 
